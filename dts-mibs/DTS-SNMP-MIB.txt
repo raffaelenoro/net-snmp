@@ -1,0 +1,92 @@
+DTS-SNMP-MIB DEFINITIONS ::= BEGIN
+
+--
+-- Top-level infrastructure of the DTS enterprise MIB tree
+--
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,            Counter32,
+    enterprises                              FROM SNMPv2-SMI
+    DisplayString                            FROM SNMPv2-TC;
+
+dts MODULE-IDENTITY
+    LAST-UPDATED "201903050000Z"
+    ORGANIZATION "www.xperi.com"
+    CONTACT-INFO    
+     "postal:   Xperi, Inc.
+                5220 Las Virgenes Road,
+                Calabasas, CA 91302
+
+      email:    contact@xperi.com"
+    DESCRIPTION
+      "Top-level infrastructure of the DTS enterprise MIB tree"
+
+    REVISION     "201903050000Z" -- Mar 05, 2019
+    DESCRIPTION
+     "First draft"
+
+    ::= { enterprises 5220 }
+
+
+--
+-- Define the Float Textual Convention
+--   This definition was written by David Perkins.
+--
+
+Float ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A single precision floating-point number.  The semantics
+         and encoding are identical for type 'single' defined in
+         IEEE Standard for Binary Floating-Point,
+         ANSI/IEEE Std 754-1985.
+         The value is restricted to the BER serialization of
+         the following ASN.1 type:
+             FLOATTYPE ::= [120] IMPLICIT FloatType
+         (note: the value 120 is the sum of '30'h and '48'h)
+         The BER serialization of the length for values of
+         this type must use the definite length, short
+         encoding form.
+
+         For example, the BER serialization of value 123
+         of type FLOATTYPE is '9f780442f60000'h.  (The tag
+         is '9f78'h; the length is '04'h; and the value is
+         '42f60000'h.) The BER serialization of value
+         '9f780442f60000'h of data type Opaque is
+         '44079f780442f60000'h. (The tag is '44'h; the length
+         is '07'h; and the value is '9f780442f60000'h.)"
+    SYNTAX Opaque (SIZE (7))
+
+
+--
+-- Define the Boolean Textual Convention
+--
+
+Boolean ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Represents a boolean value."
+    SYNTAX       INTEGER { true(1), false(0) }
+
+
+--
+--  DTS-SNMP enterprise-specific management objects
+--
+
+dtsProducts             OBJECT IDENTIFIER ::= { dts 1 }
+dtsTools                OBJECT IDENTIFIER ::= { dts 2 }
+dtsExperimental         OBJECT IDENTIFIER ::= { dts 9999 }
+
+
+--
+-- A subtree specifically designed for private testing purposes.
+-- No "public" management objects should ever be defined within this tree.
+--
+-- It is provided for private experimentation, prior to transferring a MIB
+-- structure to another part of the overall OID tree
+--
+
+dtsSandbox              OBJECT IDENTIFIER ::= { dtsExperimental 9999 }
+
+
+END

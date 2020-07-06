@@ -1,0 +1,171 @@
+DTS-TOOL-SMARTEQ-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE, Counter32   FROM SNMPv2-SMI
+   DisplayString, RowStatus                  FROM SNMPv2-TC
+   Float, Boolean, dtsTools                  FROM DTS-SNMP-MIB;
+
+smarteq MODULE-IDENTITY
+   LAST-UPDATED "201904010000Z"
+   ORGANIZATION "www.xperi.com"
+   CONTACT-INFO
+      "postal: Xperi, Inc.
+               5220 Las Virgenes Road,
+               Calabasas, CA 91302
+       email: contact@xperi.com"
+   DESCRIPTION "DTS Smart EQ tool"
+
+   REVISION "201904010000Z" -- Apr 01, 2019
+   DESCRIPTION "First Draft"
+
+   ::= { dtsTools 101 }
+
+--
+-- Scalar configuration parameters
+--
+
+toolVersion OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (0..255))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Tool Version"
+   ::= { smarteq 1 }
+
+snmpEnabled OBJECT-TYPE
+   SYNTAX Boolean
+   MAX-ACCESS read-only
+   STATUS current
+   DEFVAL { false }
+   DESCRIPTION "Global enable of the SNMP agent"
+   ::= { smarteq 2 }
+
+-- Analysis parameters
+
+analysisEnabled OBJECT-TYPE
+   SYNTAX Boolean
+   MAX-ACCESS read-write
+   STATUS current
+   DEFVAL { true }
+   DESCRIPTION "Global enable of the Analyzer sub-component"
+   ::= { smarteq 3 }
+
+timeAnalysisEnabled OBJECT-TYPE
+   SYNTAX Boolean
+   MAX-ACCESS read-write
+   STATUS current
+   DEFVAL { true }
+   DESCRIPTION "Global enable of the Time Analyzer sub-component only"
+   ::= { smarteq 4 }
+
+-- System Parameters
+
+saveWavFilesEnabled OBJECT-TYPE
+   SYNTAX Boolean
+   MAX-ACCESS read-write
+   STATUS current
+   DEFVAL { false }
+   DESCRIPTION "Global enable for saving WAV files into the tuning session data"
+   ::= { smarteq 11 }
+
+numberOfMicrophones OBJECT-TYPE
+   SYNTAX Unsigned32
+   MAX-ACCESS read-only
+   STATUS current
+   DEFVAL { 2 }
+   DESCRIPTION "Global number of microphone inputs"
+   ::= { smarteq 12 }
+
+microphoneSelected OBJECT-TYPE
+   SYNTAX Unsigned32
+   MAX-ACCESS read-write
+   STATUS current
+   DEFVAL { 0 }
+   DESCRIPTION "Index of the selected microphone input"
+   ::= { smarteq 13 }
+
+--
+-- Table of EQ Filters
+--
+
+eqFilterTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF EqFilterEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "Table of EQ Filters"
+   ::= { smarteq 101 }
+
+eqFilterEntry OBJECT-TYPE
+   SYNTAX EqFilterEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "EQ Filter"
+   INDEX { eqFilterIndex }
+   ::= { eqFilterTable 1 }
+
+EqFilterEntry ::= SEQUENCE {
+   eqFilterIndex Unsigned32,
+   eqFilterFrequency Float,
+   eqFilterGain Float,
+   eqFilterQ Float,
+   eqFilterType INTEGER,
+   eqFilterStatus RowStatus
+}
+
+eqFilterIndex OBJECT-TYPE
+   SYNTAX Unsigned32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Index of the filter"
+   ::= { eqFilterEntry 1 }
+
+eqFilterFrequency OBJECT-TYPE
+   SYNTAX Float
+   MAX-ACCESS read-write
+   STATUS current
+   DEFVAL { 2000.0 }
+   DESCRIPTION "Center frequency of the filter"
+   ::= { eqFilterEntry 2 }
+
+eqFilterGain OBJECT-TYPE
+   SYNTAX Float
+   MAX-ACCESS read-write
+   STATUS current
+   DEFVAL { 0.0 }
+   DESCRIPTION "Gain of the filter"
+   ::= { eqFilterEntry 3 }
+
+eqFilterQ OBJECT-TYPE
+   SYNTAX Float
+   MAX-ACCESS read-write
+   STATUS current
+   DEFVAL { 2.0 }
+   DESCRIPTION "Q factor of the filter"
+   ::= { eqFilterEntry 4 }
+
+eqFilterType OBJECT-TYPE
+   SYNTAX INTEGER {
+             traditionalEQ(0),
+             peakingEQ(1),
+             lowShelf(2),
+             highShelf(3),
+             lowPass(4),
+             highPass(5),
+             bandPass(6),
+             allPass(7),
+             notch(8)
+          }
+   MAX-ACCESS read-write
+   STATUS current
+   DEFVAL { peakingEQ }
+   DESCRIPTION "Type of the filter"
+   ::= { eqFilterEntry 5 }
+
+eqFilterStatus OBJECT-TYPE
+   SYNTAX RowStatus
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION "Status"
+   ::= { eqFilterEntry 9 }
+
+END
+
